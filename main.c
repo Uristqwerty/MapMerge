@@ -57,5 +57,5 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    return WriteMap(output, argv[2]);
+    return !WriteMap(output, argv[2]);
 }
