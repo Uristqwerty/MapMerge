@@ -2,9 +2,19 @@
 
 int main(int argc, char *argv[])
 {
-    int i;
-    for(i=0; i<argc; i++)
-      printf("%d: %s\n", i, argv[i]);
-    system("pause");
+    int mergeMarker = 7;
+    if(argc == 5)
+    {
+        mergeMarker = atoi(argv[4]);
+        argc--;
+    }
+
+    if(argc != 4 || !mergeMarker)
+    {
+        printf("Improper invocation. Usage:\n"
+               "MapMerge <AncestorFile (filename)> <CurrentFile (filename)> <MergingFile (filename)> [<MergeMarker length (integer, optional)>]\n");
+        return 1;
+    }
+
     return 0;
 }
