@@ -6,7 +6,7 @@ Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
 {
     if(!ancestor || !current || !merge)
     {
-        printf("Could not merge maps; at least one of the passed Map pointers was null. Talk to a dev about it, this is an internal error.\n");
+        printf("Could not merge maps; at least one of the passed Map pointers was null. Talk to a MapMerge dev about it, this is an internal error.\n");
         return 0;
     }
 

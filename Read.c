@@ -21,7 +21,7 @@ Map *ReadMap(char *filename)
 {
     if(!filename)
     {
-        printf("Could not read map; null filename. Talk to a dev about it, this is an internal error.\n");
+        printf("Could not read map; null filename. Talk to a MapMerge dev about it, this is an internal error.\n");
         return NULL;
     }
 
@@ -44,7 +44,12 @@ Map *ReadMap(char *filename)
 
     while(!isEmpty(line))
     {
-        
+        if(!TileList_AddLine(tileList, line))
+        {
+            deleteTileList(tileList);
+            return NULL;
+        }
+
         line = fgets(buffer, sizeof(buffer), mapFile);
     }
 

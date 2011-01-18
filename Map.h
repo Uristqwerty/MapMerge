@@ -1,19 +1,7 @@
 #ifndef MAPMERGE_MAP_H
 #define MAPMERGE_MAP_H
 
-typedef struct MapObject
-{
-    void *path;
-    void *vars;
-} MapObject;
-
-
-typedef struct Tile
-{
-    MapObject area, turf;
-    unsigned int numObjects;
-    MapObject *objects;
-} Tile;
+#include "Tile.h"
 
 
 typedef struct Map
@@ -21,5 +9,6 @@ typedef struct Map
     unsigned int width, height, levels;
     Tile data[];
 } Map;
+
 
 #endif
