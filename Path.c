@@ -92,4 +92,22 @@ Path *GetPath(char *pathText)
     return path;
 }
 
+void Path_Write(Path *this, FILE *out)
+{
+    if(!this)
+    {
+        printf("Could not write Path; null Path. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return;
+    }
+
+    if(this->parent)
+    {
+        Path_Write(this->parent, out);
+        fprintf(out, "/");
+    }
+
+    fprintf(out, "%s", this->name);
+}
+
+
 

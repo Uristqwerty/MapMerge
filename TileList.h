@@ -22,4 +22,7 @@ TileList *newTileList();
 
 unsigned int TileList_AddLine(TileList *this, char *line);
 
+int TileList_AddTile(TileList *this, Tile *add);
+int TileList_IndexOfEqualTile(TileList *this, Tile *search);
+
 #endif

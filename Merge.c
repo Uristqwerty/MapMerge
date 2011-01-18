@@ -34,7 +34,36 @@ Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
     if(!map)
       return NULL;
 
-    printf("Could not merge maps; function is unimplemented.\n");
-    return NULL;
+    int x, y, z;
+    Tile *ancestorTile, *currentTile, *mergeTile;
+
+    for(z=0; z<map->levels; z++)
+     for(y=0; y<map->height; y++)
+      for(x=0; x<map-> width; x++)
+    {
+        ancestorTile = Map_GetTile(ancestor, x, y, z);
+        currentTile = Map_GetTile(current, x, y, z);
+        mergeTile = Map_GetTile(merge, x, y, z);
+
+        if(Tile_isEqual(currentTile, mergeTile))
+        {
+            Map_SetTile(map, currentTile, x, y, z);
+        }
+        else if(!mergeTile || Tile_isEqual(ancestorTile, mergeTile))
+        {
+            Map_SetTile(map, currentTile, x, y, z);
+        }
+        else if(!currentTile || Tile_isEqual(ancestorTile, currentTile))
+        {
+            Map_SetTile(map, mergeTile, x, y, z);
+        }
+        else
+        {
+            printf("Could not merge maps; both current and merge changed tile at %d, %d, %d.\nMerging tiles is currently unimplemented.\n", x, y, z);
+            return NULL;
+        }
+    }
+
+    return map;
 }
 

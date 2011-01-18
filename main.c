@@ -29,22 +29,22 @@ int main(int argc, char *argv[])
 
     Map *ancestor, *current, *merge, *output;
 
-    printf("\nReading ancestor map...\n");
+    printf("Reading ancestor map...\n");
     ancestor = ReadMap(argv[1]);
     if(!ancestor)
       return 1;
 
-    printf("\nReading current map...\n");
+    printf("Reading current map...\n");
     current = ReadMap(argv[2]);
     if(!current)
       return 1;
 
-    printf("\nReading merging map...\n");
+    printf("Reading merging map...\n");
     merge = ReadMap(argv[3]);
     if(!merge)
       return 1;
 
-    printf("\nMerging maps...\n");
+    printf("Merging maps...\n");
     output = MergeMaps(ancestor, current, merge);
     if(!output)
     {
@@ -52,5 +52,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    return !WriteMap(output, argv[2]);
+    printf("Writing merged map...\n");
+    if(WriteMap(output, argv[2]))
+      exit(0);
+    else
+      return 1;
 }

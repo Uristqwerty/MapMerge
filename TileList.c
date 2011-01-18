@@ -184,4 +184,48 @@ Tile *TileList_GetTile(TileList *this, int index)
     return &this->tiles[index];
 }
 
+int TileList_IndexOfEqualTile(TileList *this, Tile *search)
+{
+    if(!this)
+    {
+        printf("Could not search for a tile in TileList; null TileList. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return -1;
+    }
+    if(!search)
+    {
+        printf("Could not search for a tile in TileList; null Tile. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return -1;
+    }
+
+    int i;
+    for(i=0; i<this->numTiles; i++)
+    {
+        if(Tile_isEqual(search, &this->tiles[i]))
+          return i;
+    }
+
+    return -1;
+}
+
+int TileList_AddTile(TileList *this, Tile *add)
+{
+    if(!this)
+    {
+        printf("Could not add a tile to TileList; null TileList. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return -1;
+    }
+    if(!add)
+    {
+        printf("Could not add a tile to TileList; null Tile. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return -1;
+    }
+
+    Tile *tile = TileList_getNewTile(this);
+    if(!tile)
+      return -1;
+
+    *tile = *add;
+    return this->numTiles - 1;
+}
+
 
