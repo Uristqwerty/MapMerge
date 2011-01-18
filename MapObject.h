@@ -13,5 +13,7 @@ typedef struct MapObject
 
 void MapObject_Write(MapObject *this, FILE *file);
 
+int MapObject_isEqual(MapObject *this, MapObject *other);
+
 
 #endif

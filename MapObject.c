@@ -21,3 +21,13 @@ void MapObject_Write(MapObject *this, FILE *file)
       ;//Path_Write(this->path, file);
 }
 
+int MapObject_isEqual(MapObject *this, MapObject *other)
+{
+    if(!this || !other)
+      return 0;
+
+    if(this->path != other->path)
+      return 0;
+
+    return 1;
+}

@@ -48,6 +48,11 @@ int Tile_isEqual(Tile *this, Tile *other)
     if(this->turf.path != other->turf.path)
       return 0;
 
+    int i;
+    for(i=0; i<this->numObjects; i++)
+      if(!MapObject_isEqual(&this->objects[i], &other->objects[i]))
+        return 0;
+
     return 1;
 }
 
