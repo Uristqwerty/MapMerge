@@ -16,6 +16,7 @@ typedef struct TileList
 void deleteTileList(TileList *tileList);
 
 Tile *TileList_getNewTile(TileList *this);
+Tile *TileList_GetTile(TileList *this, int index);
 
 TileList *newTileList();
 

@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 
     printf("\nReading merging map...\n");
     merge = ReadMap(argv[3]);
+    if(!merge)
       return 1;
 
     printf("\nMerging maps...\n");

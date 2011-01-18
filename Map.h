@@ -11,4 +11,11 @@ typedef struct Map
 } Map;
 
 
+Map *newMap();
+Map *Map_Resized(Map *this);
+
+void Map_SetTile(Map *this, Tile *tile, int x, int y, int z);
+
+Tile *Map_GetTile(Map *this, int x, int y, int z);
+
 #endif

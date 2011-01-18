@@ -53,7 +53,97 @@ Map *ReadMap(char *filename)
         line = fgets(buffer, sizeof(buffer), mapFile);
     }
 
-    printf("Could not read map; function is unimplemented.\n");
-    return NULL;
+
+    Map *map = newMap();
+    if(!map)
+      return NULL;
+
+    line = fgets(buffer, sizeof(buffer), mapFile);
+    int x, y, z;
+    char c;
+    while(line)
+    {
+        if(line[0] == '(')
+        {
+            if(sscanf(line, "(%d,%d,%d) = {%c", &x, &y, &z, &c) != 4 || c != '"')
+            {
+                printf("Could not read map; could not read coordinates.\n");
+                return NULL;
+            }
+            if(x != 1 || y != 1 || z != map->levels + 1)
+            {
+                printf("Could not read map; unexpected coordinates.\n");
+                return NULL;
+            }
+            else
+            {
+                x = 0;
+                y = 0;
+                z = map->levels;
+                map->levels++;
+                map = Map_Resized(map);
+                if(!map)
+                  return NULL;
+            }
+        }
+        else if(isEmpty(line) || strcmp(line, "\"}\n") == 0 || map->levels == 0)
+        {
+        }
+        else
+        {
+            int len = strlen(line) - 1;
+            int width = len/tileList->charsPerTile;
+
+            if(map->width == 0)
+            {
+                map->width = width;
+                map->height = 0;
+            }
+            else if(map->width != width)
+            {
+                printf("Could not read map; width varies.\n");
+                return NULL;
+            }
+
+            if(map->levels == 1)
+            {
+                map->height++;
+                map = Map_Resized(map);
+                if(!map)
+                  return NULL;
+            }
+            else if(y >= map->height)
+            {
+                printf("Could not read map; height varies.\n");
+                return NULL;
+            }
+
+            for(x=0; x<width; x++)
+            {
+                int i, index = 0;
+                for(i=0; i<tileList->charsPerTile; i++)
+                {
+                    char c = line[tileList->charsPerTile * x];
+                    if(c >= 'a' && c <= 'z')
+                      index = index * 52 + c - 'a';
+                    else if(c >= 'A' && c <= 'Z')
+                      index = index * 52 + c - 'A' + 26;
+                }
+
+                Map_SetTile(map, TileList_GetTile(tileList, index), x, y, z);
+            }
+
+            y++;
+        }
+
+        line = fgets(buffer, sizeof(buffer), mapFile);
+    }
+
+    deleteTileList(tileList);
+
+    fclose(mapFile);
+
+    return map;
 }
+
 

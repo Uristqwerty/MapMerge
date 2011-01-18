@@ -36,7 +36,7 @@ void deleteTileList(TileList *tileList)
         return;
     }
 
-    //deleteTileArray(tileList->tiles);
+    free(tileList->tiles);
     free(tileList);
 }
 
@@ -168,5 +168,20 @@ Tile *TileList_getNewTile(TileList *this)
     return NULL;
 }
 
+Tile *TileList_GetTile(TileList *this, int index)
+{
+    if(!this)
+    {
+        printf("Could not get a tile from TileList; null TileList. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return NULL;
+    }
+    if(index < 0 || index >= this->numTiles)
+    {
+        printf("Could not get a tile from TileList; index out of range. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return NULL;
+    }
+
+    return &this->tiles[index];
+}
 
 
