@@ -14,9 +14,9 @@ typedef struct Tile
 
 MapObject *Tile_getNewMapObject(Tile *this);
 
+int Tile_Init(Tile *this);
 int Tile_isEqual(Tile *this, Tile *other);
 
 void Tile_Write(Tile *this, FILE *out);
-
 
 #endif

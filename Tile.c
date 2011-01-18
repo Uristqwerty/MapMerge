@@ -11,8 +11,26 @@ MapObject *Tile_getNewMapObject(Tile *this)
         return NULL;
     }
 
-    printf("Could not get new MapObject from Tile; unimplemented\n");
-    return NULL;
+    if(this->numObjects >= this->allocatedObjects)
+    {
+        MapObject *objects = realloc(this->objects, sizeof(MapObject) * (this->allocatedObjects + 8));
+        if(!objects)
+        {
+            printf("Could not get new MapObject from Tile; malloc failure. Talk to a MapMerge dev about it, this is an internal error.\n");
+            return NULL;
+        }
+
+        this->objects = objects;
+        this->allocatedObjects += 8;
+    }
+
+    MapObject *mapObject = &this->objects[this->numObjects];
+    this->numObjects++;
+
+    mapObject->path = NULL;
+    mapObject->vars = NULL;
+
+    return mapObject;
 }
 
 int Tile_isEqual(Tile *this, Tile *other)
@@ -57,3 +75,27 @@ void Tile_Write(Tile *this, FILE *file)
     fprintf(file, ",");
     MapObject_Write(&this->area, file);
 }
+
+int Tile_Init(Tile *this)
+{
+    if(!this)
+    {
+        printf("Could not init Tile; null Tile. Talk to a MapMerge dev about it, this is an internal error.\n");
+        return 0;
+    }
+
+    this->area.path = NULL;
+    this->area.vars = NULL;
+    this->turf.path = NULL;
+    this->turf.vars = NULL;
+    this->area.path = NULL;
+
+    this->objects = NULL;
+    this->numObjects = 0;
+    this->allocatedObjects = 0;
+
+    return 1;
+}
+
+
+

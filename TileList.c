@@ -160,8 +160,13 @@ Tile *TileList_getNewTile(TileList *this)
 
     if(this->numTiles < this->allocatedTiles)
     {
+        Tile *tile = &this->tiles[this->numTiles];
         this->numTiles++;
-        return &this->tiles[this->numTiles - 1];
+
+        if(!Tile_Init(tile))
+          return NULL;
+
+        return tile;
     }
 
     printf("Unimplemented: Expand TileList if it runs out of allocated tiles. Aborting.\n");
