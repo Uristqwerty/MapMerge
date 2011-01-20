@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Path.h"
+#include "Vars.h"
 #include "TileList.h"
 #include "Map.h"
 
@@ -107,6 +108,7 @@ unsigned int TileList_AddLine(TileList *this, char *line)
     i = len + 4;
     len = strlen(line);
     int start = i;
+    Vars *vars = NULL;
     for(i; i<len; i++)
     {
         if(line[i] == ',' || line[i] == ')')
@@ -122,12 +124,12 @@ unsigned int TileList_AddLine(TileList *this, char *line)
             if(strncmp(temp, "/turf", strlen("/turf")) == 0)
             {
                 tile->turf.path = path;
-                tile->turf.vars = NULL;
+                tile->turf.vars = vars;
             }
             else if(strncmp(temp, "/area", strlen("/area")) == 0)
             {
                 tile->area.path = path;
-                tile->area.vars = NULL;
+                tile->area.vars = vars;
             }
             else
             {
@@ -136,14 +138,16 @@ unsigned int TileList_AddLine(TileList *this, char *line)
                   return 0;
 
                 mapObject->path = path;
-                mapObject->vars = NULL;
+                mapObject->vars = vars;
             }
             start = i + 1;
+            vars = NULL;
         }
         else if(line[i] == '{')
         {
-            printf("Could not add MapObject with vars; unimplemented.\n");
-            return 0;
+            vars = Vars_ParseLine(line, &i);
+            if(!vars)
+              return 0;
         }
     }
 
@@ -158,19 +162,19 @@ Tile *TileList_getNewTile(TileList *this)
         return NULL;
     }
 
-    if(this->numTiles < this->allocatedTiles)
+    if(this->numTiles >= this->allocatedTiles)
     {
-        Tile *tile = &this->tiles[this->numTiles];
-        this->numTiles++;
-
-        if(!Tile_Init(tile))
-          return NULL;
-
-        return tile;
+        printf("Unimplemented: Expand TileList if it runs out of allocated tiles. Aborting.\n");
+        return NULL;
     }
 
-    printf("Unimplemented: Expand TileList if it runs out of allocated tiles. Aborting.\n");
-    return NULL;
+    Tile *tile = &this->tiles[this->numTiles];
+    this->numTiles++;
+
+    if(!Tile_Init(tile))
+      return NULL;
+
+    return tile;
 }
 
 Tile *TileList_GetTile(TileList *this, int index)

@@ -3,12 +3,13 @@
 
 #include <stdio.h>
 #include "Path.h"
+#include "Vars.h"
 
 
 typedef struct MapObject
 {
     Path *path;
-    void *vars;
+    Vars *vars;
 } MapObject;
 
 void MapObject_Write(MapObject *this, FILE *file);

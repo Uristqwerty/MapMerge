@@ -36,6 +36,9 @@ Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
 
     int x, y, z;
     Tile *ancestorTile, *currentTile, *mergeTile;
+    Tile blankTile = {{NULL, NULL}, {NULL, NULL}, 0, 0, NULL};
+    blankTile.area.path = GetPath("/area");
+    blankTile.turf.path = GetPath("/turf");
 
     for(z=0; z<map->levels; z++)
      for(y=0; y<map->height; y++)
@@ -45,7 +48,14 @@ Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
         currentTile = Map_GetTile(current, x, y, z);
         mergeTile = Map_GetTile(merge, x, y, z);
 
-        if(Tile_isEqual(currentTile, mergeTile))
+        if(!mergeTile && currentTile)
+        {
+            if(mergeTile)
+              Map_SetTile(map, ancestorTile, x, y, z);
+            else
+              Map_SetTile(map, &blankTile, x, y, z);
+        }
+        else if(Tile_isEqual(currentTile, mergeTile))
         {
             Map_SetTile(map, currentTile, x, y, z);
         }
