@@ -178,6 +178,8 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
                 printf("Could not parse values; invalid number.\n");
                 return 0;
             }
+
+            i += 4;
         }
 
         if(line[pos + i] != ';' && line[pos + i] != '}')
