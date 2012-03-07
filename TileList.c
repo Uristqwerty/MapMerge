@@ -111,11 +111,23 @@ unsigned int TileList_AddLine(TileList *this, char *line)
     Vars *vars = NULL;
     for(i; i<len; i++)
     {
+        int end = 0;
+        if(line[i] == '{')
+        {
+            end = i;
+            vars = Vars_ParseLine(line, &i, len);
+            if(vars == NULL)
+              return 0;
+
+            i++;
+        }
         if(line[i] == ',' || line[i] == ')')
         {
-            char temp[i - start + 1];
-            strncpy(temp, &line[start], i - start);
-            temp[i - start] = '\0';
+            if(end == 0)
+              end = i;
+            char temp[end - start + 1];
+            strncpy(temp, &line[start], end - start);
+            temp[end - start] = '\0';
 
             Path *path = GetPath(temp);
             if(!path)
@@ -142,12 +154,6 @@ unsigned int TileList_AddLine(TileList *this, char *line)
             }
             start = i + 1;
             vars = NULL;
-        }
-        else if(line[i] == '{')
-        {
-            vars = Vars_ParseLine(line, &i, len);
-            if(vars == NULL)
-              return 0;
         }
     }
 

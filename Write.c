@@ -89,8 +89,6 @@ int WriteMap(Map *map, char *filename)
         fprintf(mapFile, "\"}\n");
     }
 
-    printf("Could not write map; function is unimplemented.\n");
-
     fflush(mapFile);
     fclose(mapFile);
     return 1;

@@ -41,5 +41,8 @@ typedef struct Vars
 
 Vars *Vars_ParseLine(char *line, int *position, int length);
 
+int Vars_isEqual(Vars *this, Vars *other);
+
+void Parameter_Write(Parameter *this, FILE *file);
 
 #endif

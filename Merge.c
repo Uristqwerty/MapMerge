@@ -48,12 +48,9 @@ Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
         currentTile = Map_GetTile(current, x, y, z);
         mergeTile = Map_GetTile(merge, x, y, z);
 
-        if(!mergeTile && currentTile)
+        if(!mergeTile && !currentTile)
         {
-            if(mergeTile)
-              Map_SetTile(map, ancestorTile, x, y, z);
-            else
-              Map_SetTile(map, &blankTile, x, y, z);
+            Map_SetTile(map, &blankTile, x, y, z);
         }
         else if(Tile_isEqual(currentTile, mergeTile))
         {
