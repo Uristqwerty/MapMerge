@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     printf("Writing merged map...\n");
     if(WriteMap(output, argv[2]))
-      exit(0);
+      return 0;
     else
       return 1;
 }

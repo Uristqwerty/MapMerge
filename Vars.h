@@ -39,7 +39,7 @@ typedef struct Vars
     Parameter *parameters;
 } Vars;
 
-Vars *Vars_ParseLine(char *line, int *position);
+Vars *Vars_ParseLine(char *line, int *position, int length);
 
 
 #endif

@@ -145,8 +145,8 @@ unsigned int TileList_AddLine(TileList *this, char *line)
         }
         else if(line[i] == '{')
         {
-            vars = Vars_ParseLine(line, &i);
-            if(!vars)
+            vars = Vars_ParseLine(line, &i, len);
+            if(vars == NULL)
               return 0;
         }
     }

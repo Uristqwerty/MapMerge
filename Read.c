@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "Map.h"
 #include "TileList.h"
 #include "Read.h"
@@ -35,7 +36,10 @@ Map *ReadMap(char *filename)
 
     TileList *tileList = newTileList();
     if(!tileList)
-      return NULL;
+    {
+        fclose(mapFile);
+        return NULL;
+    }
 
     char buffer[65536]; //Arbitrary size, probably excessive, but far better than insufficient. 
     char *line;
@@ -47,6 +51,7 @@ Map *ReadMap(char *filename)
         if(!TileList_AddLine(tileList, line))
         {
             deleteTileList(tileList);
+            fclose(mapFile);
             return NULL;
         }
 
@@ -56,7 +61,10 @@ Map *ReadMap(char *filename)
 
     Map *map = newMap();
     if(!map)
-      return NULL;
+    {
+        fclose(mapFile);
+        return NULL;
+    }
 
     line = fgets(buffer, sizeof(buffer), mapFile);
     int x, y, z;
@@ -68,11 +76,13 @@ Map *ReadMap(char *filename)
             if(sscanf(line, "(%d,%d,%d) = {%c", &x, &y, &z, &c) != 4 || c != '"')
             {
                 printf("Could not read map; could not read coordinates.\n");
+                fclose(mapFile);
                 return NULL;
             }
             if(x != 1 || y != 1 || z != map->levels + 1)
             {
                 printf("Could not read map; unexpected coordinates.\n");
+                fclose(mapFile);
                 return NULL;
             }
             else
@@ -83,7 +93,10 @@ Map *ReadMap(char *filename)
                 map->levels++;
                 map = Map_Resized(map);
                 if(!map)
-                  return NULL;
+                {
+                    fclose(mapFile);
+                    return NULL;
+                }
             }
         }
         else if(isEmpty(line) || strcmp(line, "\"}\n") == 0 || map->levels == 0)
@@ -102,6 +115,7 @@ Map *ReadMap(char *filename)
             else if(map->width != width)
             {
                 printf("Could not read map; width varies.\n");
+                fclose(mapFile);
                 return NULL;
             }
 
@@ -110,11 +124,15 @@ Map *ReadMap(char *filename)
                 map->height++;
                 map = Map_Resized(map);
                 if(!map)
-                  return NULL;
+                {
+                    fclose(mapFile);
+                    return NULL;
+                }
             }
             else if(y >= map->height)
             {
                 printf("Could not read map; height varies.\n");
+                fclose(mapFile);
                 return NULL;
             }
 
