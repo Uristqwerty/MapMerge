@@ -42,10 +42,10 @@ int Tile_isEqual(Tile *this, Tile *other)
     if(this->numObjects != other->numObjects)
       return 0;
 
-    if(this->area.path != other->area.path)
+    if(!MapObject_isEqual(&this->area, &other->area))
       return 0;
 
-    if(this->turf.path != other->turf.path)
+    if(!MapObject_isEqual(&this->turf, &other->turf))
       return 0;
 
     int i;

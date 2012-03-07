@@ -127,17 +127,17 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
 {
     if(!parameter)
     {
-        printf("Could not parse values; null Parameter. Talk to a MapMerge dev about it, this is an internal error.\n");
+        printf("(%s: %d) Could not parse values; null Parameter. Talk to a MapMerge dev about it, this is an internal error.\n", __FILE__, __LINE__);
         return 0;
     }
     if(pos < 1)
     {
-        printf("Could not parse values; invalid pos. Talk to a MapMerge dev about it, this is an internal error.\n");
+        printf("(%s: %d) Could not parse values; invalid pos. Talk to a MapMerge dev about it, this is an internal error.\n", __FILE__, __LINE__);
         return 0;
     }
     if(line[pos] != '=' || line[pos + 1] != ' ')
     {
-        printf("Could not parse values; invalid line. Talk to a MapMerge dev about it, this is an internal error.\n");
+        printf("(%s: %d) Could not parse values; invalid line. Talk to a MapMerge dev about it, this is an internal error.\n", __FILE__, __LINE__);
         return 0;
     }
 
@@ -152,7 +152,6 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
 
     if(line[pos] >= '0' && line[pos] <= '9')
     {
-        parameter->value->type = STRING;
         int i = 0;
 
         while(line[pos + i] >= '0' && line[pos + i] <= '9')
@@ -198,7 +197,38 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
 
         strncpy(num, &line[pos], i);
 
+        parameter->value->type = STRING;
         parameter->value->string = num;
+        return pos + i;
+    }
+    else if(line[pos] == '"')
+    {
+        int i = 0, escaped = 1;
+
+        while(pos + i < len && (escaped || line[pos + i] != '"'))
+        {
+            if(escaped)
+              escaped = 0;
+            else if(line[pos + i] == '\\')
+              escaped = 1;
+              
+            i++;
+        }
+
+        i++;
+
+        char *text = calloc(sizeof(char), i + 1);
+
+        if(text == NULL)
+        {
+            printf("Could not parse text value; malloc failed.\n");
+            return 0;
+        }
+
+        strncpy(text, &line[pos], i);
+
+        parameter->value->type = STRING;
+        parameter->value->string = text;
         return pos + i;
     }
 
