@@ -48,6 +48,7 @@ Map *ReadMap(char *filename)
 
     while(!isEmpty(line))
     {
+        //printf("Adding %s\n", line);
         if(!TileList_AddLine(tileList, line))
         {
             deleteTileList(tileList);
@@ -136,12 +137,12 @@ Map *ReadMap(char *filename)
                 return NULL;
             }
 
-            for(x=0; x<width; x++)
+            for(x=0; x < width; x++)
             {
                 int i, index = 0;
-                for(i=0; i<tileList->charsPerTile; i++)
+                for(i = 0; i < tileList->charsPerTile; i++)
                 {
-                    char c = line[tileList->charsPerTile * x];
+                    char c = line[tileList->charsPerTile * x + i];
                     if(c >= 'a' && c <= 'z')
                       index = index * 52 + c - 'a';
                     else if(c >= 'A' && c <= 'Z')

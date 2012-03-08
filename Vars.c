@@ -142,6 +142,9 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
         return 0;
     }
 
+    if(line[pos] == ' ')
+      pos++;
+
     if(line[pos] == '-' || (line[pos] >= '0' && line[pos] <= '9'))
     {
         int i = 0;
@@ -176,7 +179,7 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
             i += 4;
         }
 
-        if(line[pos + i] != ';' && line[pos + i] != '}')
+        if(line[pos + i] != ';' && line[pos + i] != '}' && line[pos + i] != ')')
         {
             printf("Could not parse values; invalid number.\n");
             return 0;
@@ -311,13 +314,61 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
             pos = Vars_ParseValue(param, line, pos, len);
             if(!pos)
               return 0;
+
+            if(line[pos] == ' ' && line[pos + 1] == '=')
+            {
+                Parameter *assoc = calloc(sizeof(Parameter), 2);
+                if(assoc == NULL)
+                {
+                    printf("Could not parse function parameter associations; malloc failed.\n");
+                    return 0;
+                }
+
+                assoc[0].value = param->value;
+                param->value = calloc(sizeof(Value), 1);
+                if(param->value == NULL)
+                {
+                    printf("Could not parse function parameter associations; malloc failed.\n");
+                    return 0;
+                }
+
+                param->value->type = ASSOCIATION;
+                param->value->association.key = &assoc[0];
+                param->value->association.value = &assoc[1];
+
+                pos = Vars_ParseValue(&assoc[1], line, pos + 3, len);
+            }
         }
 
         return pos + 1;
     }
 
-    printf("Unimplemented or invalid var value type.\nLine: %s\n", line);
+    printf("Unimplemented or invalid var value type.\nLine: %s\nAt: %.10s...", line, &line[pos]);
     return 0;
+}
+
+int FuncArgs_isEqual(Vars *this, Vars *other)
+{
+    if(this->numParameters != other->numParameters)
+      return 0;
+
+    int i;
+    for(i = 0; i < this->numParameters; i++)
+      if(!Parameter_isEqual(this->parameters[i], other->parameters[i]))
+        return 0;
+
+    return 1;
+}
+
+int Function_isEqual(Value *this, Value *other)
+{
+    if(strcmp(this->function.name, other->function.name) != 0)
+      return 0;
+
+    if(!FuncArgs_isEqual(this->function.args, other->function.args))
+      return 0;
+
+    return 1;
 }
 
 int Value_isEqual(Value *this, Value *other)
@@ -329,6 +380,13 @@ int Value_isEqual(Value *this, Value *other)
     {
         case STRING:
           return strcmp(this->string, other->string) == 0;
+
+        case ASSOCIATION:
+          return Parameter_isEqual(this->association.key, other->association.key) &&
+                 Parameter_isEqual(this->association.value, other->association.value);
+
+        case FUNCTION:
+          return Function_isEqual(this, other);
     }
 
     return 0;
@@ -374,6 +432,18 @@ int Vars_isEqual(Vars *this, Vars *other)
     return 1;
 }
 
+void FuncArgs_Write(Vars *this, FILE *file)
+{
+    int i;
+    for(i = 0; i < this->numParameters; i++)
+    {
+        if(i > 0)
+          fprintf(file, ", ");
+
+        Parameter_Write(&this->parameters[i], file);
+    }
+}
+
 void Value_Write(Value *this, FILE *file)
 {
     switch(this->type)
@@ -381,6 +451,18 @@ void Value_Write(Value *this, FILE *file)
         case STRING:
           fprintf(file, "%s", this->string);
           break;
+
+        case ASSOCIATION:
+          Parameter_Write(this->association.key, file);
+          fprintf(file, " = ");
+          Parameter_Write(this->association.value, file);
+          break;
+
+        case FUNCTION:
+          fprintf(file, "%s(", this->function.name);
+          FuncArgs_Write(this->function.args, file);
+          fprintf(file, ")");
+          
     }
 }
 

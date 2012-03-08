@@ -3,6 +3,7 @@
 
 
 struct MapObject;
+struct Parameter;
 
 typedef struct Value
 {
@@ -10,7 +11,8 @@ typedef struct Value
     {
         FUNCTION,
         STRING,
-        MAPOBJECT
+        MAPOBJECT,
+        ASSOCIATION
     } type;
 
     union
@@ -24,6 +26,11 @@ typedef struct Value
         char *string;
 
         struct MapObject *mapobject;
+
+        struct
+        {
+            struct Parameter *key, *value;
+        } association;
     };
 } Value;
 

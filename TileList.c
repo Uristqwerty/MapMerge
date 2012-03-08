@@ -168,10 +168,6 @@ Tile *TileList_getNewTile(TileList *this)
         return NULL;
     }
 
-    printf("TileList_getNewTile()\n");
-    printf("  this->numTiles: %d\n", this->numTiles);
-    printf("  this->allocatedTiles: %d\n", this->allocatedTiles);
-
     if(this->numTiles >= this->allocatedTiles)
     {
         this->allocatedTiles *= 2;
@@ -205,7 +201,7 @@ Tile *TileList_GetTile(TileList *this, int index)
     }
     if(index < 0 || index >= this->numTiles)
     {
-        printf("Could not get a tile from TileList; index out of range. Talk to a MapMerge dev about it, this is an internal error.\n");
+        printf("Could not get a tile from TileList; index %d out of range. Talk to a MapMerge dev about it, this is an internal error.\n", index);
         return NULL;
     }
 
