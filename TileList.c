@@ -14,7 +14,7 @@ TileList *newTileList()
         return NULL;
     }
 
-    new->tiles = calloc(sizeof(TileList), TILELIST_INITIAL_LENGTH);
+    new->tiles = calloc(sizeof(Tile), TILELIST_INITIAL_LENGTH);
     if(!new->tiles)
     {
         printf("Could not create TileList; malloc failed. Talk to a MapMerge dev about it, this is an internal error.\n");
@@ -102,7 +102,7 @@ unsigned int TileList_AddLine(TileList *this, char *line)
     }
 
     Tile *tile = TileList_getNewTile(this);
-    if(!tile)
+    if(tile == NULL)
       return 0;
 
     i = len + 4;
@@ -168,10 +168,23 @@ Tile *TileList_getNewTile(TileList *this)
         return NULL;
     }
 
+    printf("TileList_getNewTile()\n");
+    printf("  this->numTiles: %d\n", this->numTiles);
+    printf("  this->allocatedTiles: %d\n", this->allocatedTiles);
+
     if(this->numTiles >= this->allocatedTiles)
     {
-        printf("Unimplemented: Expand TileList if it runs out of allocated tiles. Aborting.\n");
-        return NULL;
+        this->allocatedTiles *= 2;
+        Tile *temp = realloc(this->tiles, this->allocatedTiles * sizeof(Tile));
+
+        if(temp == NULL)
+        {
+            printf("Could not get a new tile from TileList; allocation failure.\n");
+            this->allocatedTiles /= 2;
+            return NULL;
+        }
+
+        this->tiles = temp;
     }
 
     Tile *tile = &this->tiles[this->numTiles];

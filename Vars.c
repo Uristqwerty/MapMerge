@@ -49,11 +49,11 @@ Parameter* Vars_newParameter(Vars *vars)
     if(vars->numParameters >= vars->allocatedParameters)
     {
         vars->allocatedParameters += 4;
-        Parameter *temp = realloc(vars->parameters, vars->allocatedParameters * sizeof(Parameter*));
-        if(!temp)
+        Parameter *temp = realloc(vars->parameters, vars->allocatedParameters * sizeof(Parameter));
+
+        if(temp == NULL)
         {
-            printf("Could not add vars parameter; malloc failure.\n");
-            vars->allocatedParameters -= 4;
+            printf("Could not create parameter; malloc failure.");
             return NULL;
         }
         vars->parameters = temp;
@@ -87,7 +87,7 @@ int Vars_ParseVars(Vars *vars, char *line, int pos, int len)
 
     for(pos; pos<len; pos++)
     {
-        if(line[pos] == ' ')
+        if(line[pos] == ' ' && line[pos + 1] == '=' && line[pos + 2] == ' ')
         {
             Parameter *parameter = Vars_newParameter(vars);
             if(parameter == NULL)
@@ -101,16 +101,15 @@ int Vars_ParseVars(Vars *vars, char *line, int pos, int len)
             }
 
             strncpy(name, &line[start], pos - start);
-
             parameter->varName = name;
 
-            pos = Vars_ParseValue(parameter, line, pos+1, len);
+            pos = Vars_ParseValue(parameter, line, pos + 3, len);
             if(!pos)
               return 0;
 
             if(line[pos] == ';')
             {
-                pos++;
+                pos += 2;
                 start = pos;
             }
             else if(line[pos] == '}')
@@ -135,11 +134,6 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
         printf("(%s: %d) Could not parse values; invalid pos. Talk to a MapMerge dev about it, this is an internal error.\n", __FILE__, __LINE__);
         return 0;
     }
-    if(line[pos] != '=' || line[pos + 1] != ' ')
-    {
-        printf("(%s: %d) Could not parse values; invalid line. Talk to a MapMerge dev about it, this is an internal error.\n", __FILE__, __LINE__);
-        return 0;
-    }
 
     parameter->value = calloc(sizeof(Value), 1);
     if(parameter->value == NULL)
@@ -148,11 +142,12 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
         return 0;
     }
 
-    pos += 2;
-
-    if(line[pos] >= '0' && line[pos] <= '9')
+    if(line[pos] == '-' || (line[pos] >= '0' && line[pos] <= '9'))
     {
         int i = 0;
+
+        if(line[pos] == '-')
+          i++;
 
         while(line[pos + i] >= '0' && line[pos + i] <= '9')
           i++;
@@ -231,8 +226,97 @@ int Vars_ParseValue(Parameter *parameter, char *line, int pos, int len)
         parameter->value->string = text;
         return pos + i;
     }
+    else if(line[pos] == '\'')
+    {
+        int i = 0, escaped = 1;
 
-    printf("Unimplemented or invalid var value type.\n");
+        while(pos + i < len && (escaped || line[pos + i] != '\''))
+        {
+            if(escaped)
+              escaped = 0;
+            else if(line[pos + i] == '\\')
+              escaped = 1;
+              
+            i++;
+        }
+
+        i++;
+
+        char *text = calloc(sizeof(char), i + 1);
+
+        if(text == NULL)
+        {
+            printf("Could not parse text value; malloc failed.\n");
+            return 0;
+        }
+
+        strncpy(text, &line[pos], i);
+
+        parameter->value->type = STRING;
+        parameter->value->string = text;
+        return pos + i;
+    }
+    else if(line[pos] == 'n' && line[pos + 1] == 'u' && line[pos + 2] == 'l' && line[pos + 3] == 'l')
+    {
+        parameter->value->type = STRING;
+        parameter->value->string = "null";
+        return pos + 4;
+    }
+    else if((line[pos] >= 'A' && line[pos] <= 'Z') || (line[pos] >= 'a' && line[pos] <= 'z') || line[pos] == '_')
+    {
+        int i = 0;
+        while((line[pos + i] >= 'A' && line[pos + i] <= 'Z') ||
+              (line[pos + i] >= 'a' && line[pos + i] <= 'z') ||
+              (line[pos + i] >= '0' && line[pos + i] <= '9') || line[pos + i] == '_')
+        {
+            i++;
+        }
+
+        if(line[pos + i] != '(')
+        {
+            printf("Could not parse function; unexpected %c.\n", line[pos + i]);
+            return 0;
+        }
+
+        char *name = calloc(sizeof(char), i + 1);
+        Vars *vars = malloc(sizeof(Vars));
+
+        if(name == NULL || vars == NULL)
+        {
+            printf("Could not parse function; malloc failed.\n");
+            return 0;
+        }
+
+        strncpy(name, &line[pos], i);
+
+        vars->numParameters = 0;
+        vars->allocatedParameters = 0;
+        vars->parameters = NULL;
+
+        parameter->value->type = FUNCTION;
+        parameter->value->function.name = name;
+        parameter->value->function.args = vars;
+
+        pos += i + 1;
+
+        while(pos < len && line[pos] != ')')
+        {
+            Parameter *param = Vars_newParameter(vars);
+            if(param == NULL)
+              return 0;
+
+            if(line[pos] == ',')
+              pos++;
+
+            pos = Vars_ParseValue(param, line, pos, len);
+            if(!pos)
+              return 0;
+        }
+
+        return pos + 1;
+    }
+
+    printf("Unimplemented or invalid var value type.\nLine: %s\n", line);
     return 0;
 }
 
