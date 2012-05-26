@@ -3,6 +3,19 @@
 #include "Map.h"
 #include "Merge.h"
 
+
+Tile* MergeTiles(Tile *current, Tile *merge, Tile *ancestor, int x, int y, int z)
+{
+    Tile *result = Tile_Copy(current);
+
+    if(Tile_Merge(result, merge, ancestor))
+    {
+        printf("WARNING: Merge conflict at (%d, %d, %d)!\n", x, y, z);
+    }
+
+    return result;
+}
+
 Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
 {
     if(!ancestor || !current || !merge)
@@ -66,8 +79,7 @@ Map *MergeMaps(Map *ancestor, Map *current, Map *merge)
         }
         else
         {
-            printf("Could not merge maps; both current and merge changed tile at %d, %d, %d.\nMerging tiles is currently unimplemented.\n", x, y, z);
-            return NULL;
+            Map_SetTile(map, MergeTiles(mergeTile, currentTile, ancestorTile, x, y, z), x, y, z);
         }
     }
 

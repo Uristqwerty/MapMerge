@@ -46,10 +46,13 @@ typedef struct Vars
     Parameter *parameters;
 } Vars;
 
-Vars *Vars_ParseLine(char *line, int *position, int length);
+Vars* Vars_ParseLine(char *line, int *position, int length);
+Vars* Vars_Copy(Vars *this);
 
 int Vars_isEqual(Vars *this, Vars *other);
 
 void Parameter_Write(Parameter *this, FILE *file);
+
+char* Vars_Merge(Vars *this, Vars *other, Vars *ancestor);
 
 #endif

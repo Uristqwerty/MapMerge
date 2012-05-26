@@ -473,6 +473,49 @@ void Parameter_Write(Parameter *this, FILE *file)
     Value_Write(this->value, file);
 }
 
+Vars* Vars_Copy(Vars *this)
+{
+    if(this == NULL)
+      return NULL;
+
+    Vars *result = malloc(sizeof(Vars));
+
+    if(result == NULL)
+      return NULL;
+
+    if(this->allocatedParameters == 0)
+    {
+        result->allocatedParameters = 0;
+        result->numParameters = 0;
+        result->parameters = NULL;
+        return result;
+    }
+
+    result->parameters = malloc(sizeof(Parameter) * this->allocatedParameters);
+
+    if(result->parameters == NULL)
+    {
+        free(result);
+        return NULL;
+    }
+
+    result->allocatedParameters = this->allocatedParameters;
+    result->numParameters = this->numParameters;
+
+    int i;
+    for(i = 0; i < this->allocatedParameters; i++)
+    {
+        result->parameters[i] = this->parameters[i];
+    }
+
+    return result;
+}
+
+char* Vars_Merge(Vars *this, Vars *other, Vars *ancestor)
+{
+    return "Merging vars is not implemented yet";
+}
+
 
 
 

@@ -50,7 +50,7 @@ Path *Path_GetChild(Path *this, char *pathText)
 
     strcpy(this->children[this->numChildren]->name, pathText);
 
-    printf("Added new Path, \"%s\". Parent: \"%s\"\n", this->children[this->numChildren]->name, this->name);
+    //printf("Added new Path, \"%s\". Parent: \"%s\"\n", this->children[this->numChildren]->name, this->name);
 
     this->numChildren++;
     return this->children[this->numChildren - 1];
